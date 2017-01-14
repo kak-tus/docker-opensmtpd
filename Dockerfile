@@ -21,7 +21,7 @@ RUN \
 
 COPY smtpd.hcl /etc/smtpd.hcl
 COPY smtpd.conf.template /root/smtpd.conf.template
-COPY smtpd_start.sh /usr/local/bin/smtpd_start.sh
+COPY smtpd_start.sh.template /root/smtpd_start.sh.template
 COPY pgpass.template /root/pgpass.template
 
 CMD consul-template -config /etc/smtpd.hcl
