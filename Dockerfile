@@ -9,6 +9,7 @@ COPY consul-template_0.18.0-rc2_SHA256SUMS /usr/local/bin/consul-template_0.18.0
 
 RUN \
   apk add --update-cache curl unzip opensmtpd postgresql-client \
+  ca-certificates \
 
   && cd /usr/local/bin \
 
