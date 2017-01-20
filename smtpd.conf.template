@@ -2,10 +2,12 @@ table domains file:/etc/smtpd/domains
 table virtual_users file:/etc/smtpd/virtual_users
 
 listen on 0.0.0.0 port 25 tag IN
+listen on 0.0.0.0 port 10029 tag IN_CHECKED
 listen on 0.0.0.0 port 10028 tag DKIM
 listen on 0.0.0.0 port 10025 tag OUT
 
-accept tagged IN from any for domain <domains> userbase <virtual_users> deliver to lmtp {{ if service "dbmail" }}{{ range service "dbmail" }}{{ .Address }}:{{ .Port }}{{ end }}{{ else }}dbmail.weave.local:24{{ end }}
+accept tagged IN from any for domain <domains> relay via smtp://{{ if service "amavis" }}{{ range service "amavis" }}{{ .Address }}:{{ .Port }}{{ end }}{{ else }}amavis.weave.local:10024{{ end }}
+accept tagged IN_CHECKED from any for domain <domains> userbase <virtual_users> deliver to lmtp {{ if service "dbmail" }}{{ range service "dbmail" }}{{ .Address }}:{{ .Port }}{{ end }}{{ else }}dbmail.weave.local:24{{ end }}
 
 accept tagged DKIM from any for any relay
 accept tagged OUT from any for any relay via smtp://{{ if service "dkim" }}{{ range service "dkim" }}{{ .Address }}:{{ .Port }}{{ end }}{{ else }}dkim.weave.local:10027{{ end }}
