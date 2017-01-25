@@ -24,5 +24,6 @@ COPY smtpd.hcl /etc/smtpd.hcl
 COPY smtpd.conf.template /root/smtpd.conf.template
 COPY smtpd_start.sh.template /root/smtpd_start.sh.template
 COPY pgpass.template /root/pgpass.template
+COPY rspamd.sh.template /root/rspamd.sh.template
 
 CMD consul-template -config /etc/smtpd.hcl
