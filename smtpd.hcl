@@ -17,6 +17,12 @@ template {
   perms = 0755
 }
 
+template {
+  source = "/root/rspamd.sh.template"
+  destination = "/usr/local/bin/rspamd.sh"
+  perms = 0755
+}
+
 exec {
   command = "/usr/local/bin/smtpd_start.sh"
   splay = "60s"
