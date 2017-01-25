@@ -1,0 +1,22 @@
+#!/usr/bin/env sh
+
+mail_file=$(mktemp)
+
+echo 'HELO localhost' >> $mail_file
+echo 'MAIL FROM: <acp@prepodam.ru>' >> $mail_file
+echo 'RCPT TO: <admin@prepodam.ru>' >> $mail_file
+echo 'DATA' >> $mail_file
+
+/usr/bin/rspamc --mime -h {{ if service "rspamd" }}{{ range service "rspamd" }}{{ .Address }}:{{ .Port }}{{ end }}{{ else }}rspamd.weave.local:11333{{ end }} >> $mail_file
+
+echo '' >> $mail_file
+echo '.' >> $mail_file
+echo 'QUIT' >> $mail_file
+
+cut_file=$(mktemp)
+sed '/Delivered-To/d' $mail_file > $cut_file
+rm "$mail_file"
+
+count=0; IFS=''; while read -r line ; do if [ "$count" -gt "5" ]; then sleep 0.05; else sleep 0.1; fi; echo "$line"; count=$((count+1)); done < "$cut_file" | netcat localhost 10029
+
+rm "$cut_file"
