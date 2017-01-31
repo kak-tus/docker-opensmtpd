@@ -10,6 +10,6 @@ accept tagged IN_CHECKED from local for domain <domains> userbase <virtual_users
 accept tagged IN from any for domain <domains> userbase <virtual_users> deliver to mda "/usr/local/bin/rspamd.sh %{sender} %{rcpt}" as admin
 
 accept tagged DKIM from any for any relay
-accept tagged OUT from any for any relay via smtp://{{ if service "dkim" }}{{ range service "dkim" }}{{ .Address }}:{{ .Port }}{{ end }}{{ else }}dkim.weave.local:10027{{ end }}
+accept tagged OUT from any for any relay via smtp://dkim.weave.local:10027
 
 reject from any for any
