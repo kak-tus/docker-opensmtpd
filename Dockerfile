@@ -15,7 +15,7 @@ RUN \
   && unzip consul-template_${CONSUL_TEMPLATE_VERSION}_linux_amd64.zip \
   && rm consul-template_${CONSUL_TEMPLATE_VERSION}_linux_amd64.zip
 
-  # Delete temporary disable due to @testing warning
+  # Delete temporary disabled due to @testing warning
   # Try enable in alpine:3.6
   # && apk del .build-deps
 
