@@ -22,6 +22,6 @@ cut_file=$(mktemp)
 sed '/Delivered-To/d' $mail_file > $cut_file
 rm "$mail_file"
 
-count=0; IFS=''; while read -r line ; do if [ "$count" -gt "5" ]; then sleep 0.05; else sleep 0.1; fi; echo "$line"; count=$((count+1)); done < "$cut_file" | netcat localhost 10029
+count=0; IFS=''; while read -r line ; do if [ "$count" -gt "5" ]; then sleep 0.05; else sleep 0.1; fi; echo "$line"; count=$((count+1)); done < "$cut_file" | nc localhost 10029
 
 rm "$cut_file"
