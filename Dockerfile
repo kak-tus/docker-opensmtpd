@@ -5,9 +5,15 @@ ENV CONSUL_TEMPLATE_SHA256=064b0b492bb7ca3663811d297436a4bbf3226de706d2b76adade7
 
 RUN \
   echo "@testing http://nl.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories \
-  && apk add --no-cache opensmtpd postgresql-client rspamd-client@testing \
 
-  && apk add --no-cache --virtual .build-deps curl unzip \
+  && apk add --no-cache \
+    opensmtpd \
+    postgresql-client \
+    rspamd-client@testing \
+
+  && apk add --no-cache --virtual .build-deps \
+    curl \
+    unzip \
 
   && cd /usr/local/bin \
   && curl -L https://releases.hashicorp.com/consul-template/${CONSUL_TEMPLATE_VERSION}/consul-template_${CONSUL_TEMPLATE_VERSION}_linux_amd64.zip -o consul-template_${CONSUL_TEMPLATE_VERSION}_linux_amd64.zip \
