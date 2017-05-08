@@ -7,7 +7,7 @@ echo "MAIL FROM: <$1>" >> $mail_file
 echo "RCPT TO: <$2>" >> $mail_file
 echo 'DATA' >> $mail_file
 
-/usr/bin/rspamc --mime -h {{ if service "rspamd" }}{{ range service "rspamd" }}{{ .Address }}:{{ .Port }}{{ end }}{{ else }}rspamd.weave.local:11333{{ end }} >> $mail_file
+/usr/bin/rspamc --mime -h {{ if service "rspamd" }}{{ range service "rspamd~_agent" }}{{ .Address }}:{{ .Port }}{{ end }}{{ else }}rspamd.weave.local:11333{{ end }} >> $mail_file
 
 greylisted=$( cat $mail_file | fgrep 'X-Spam-Action: soft reject' )
 if [ -n "$greylisted" ]; then

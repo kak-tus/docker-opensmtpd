@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-db_host={{- if env "DB_ADDR" }}{{ env "DB_ADDR" }}
+db_host={{ if env "DB_ADDR" }}{{ env "DB_ADDR" }}
   {{- else if service "db" }}
     {{- range $i, $s := service "db~_agent" }}{{ if eq $i 0 }}{{ $s.Address }}{{ end }}
     {{- end }}
