@@ -1,7 +1,13 @@
 #!/usr/bin/env sh
 
-psql -h {{ if env "DB_ADDR" }}{{ env "DB_ADDR" }}{{ else if service "db" }}{{ range service "db" }}{{ .Address }}{{ end }}{{ else }}db.weave.local{{ end }} -U mail mail -c "COPY ( SELECT DISTINCT substring( alias FROM '\@(.+)$') from dbmail_aliases ) TO STDOUT;" > /etc/smtpd/domains
-psql -h {{ if env "DB_ADDR" }}{{ env "DB_ADDR" }}{{ else if service "db" }}{{ range service "db" }}{{ .Address }}{{ end }}{{ else }}db.weave.local{{ end }} -U mail mail -c "COPY ( SELECT DISTINCT userid, '1000:1000:/root' FROM dbmail_users ) TO STDOUT;" > /etc/smtpd/virtual_users
+db_host={{- if env "DB_ADDR" }}{{ env "DB_ADDR" }}
+  {{- else if service "db" }}
+    {{- range $i, $s := service "db" }}{{ if eq $i 0 }}{{ $s.Address }}{{ end }}
+    {{- end }}
+  {{- else }}db.weave.local{{ end }}
+
+psql -h "$db_host" -U mail mail -c "COPY ( SELECT DISTINCT substring( alias FROM '\@(.+)$') from dbmail_aliases ) TO STDOUT;" > /etc/smtpd/domains
+psql -h "$db_host" -U mail mail -c "COPY ( SELECT DISTINCT userid, '1000:1000:/root' FROM dbmail_users ) TO STDOUT;" > /etc/smtpd/virtual_users
 
 smtpd -d &
 child=$!
