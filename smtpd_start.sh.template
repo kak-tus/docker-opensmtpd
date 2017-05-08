@@ -2,7 +2,7 @@
 
 db_host={{- if env "DB_ADDR" }}{{ env "DB_ADDR" }}
   {{- else if service "db" }}
-    {{- range $i, $s := service "db" }}{{ if eq $i 0 }}{{ $s.Address }}{{ end }}
+    {{- range $i, $s := service "db~_agent" }}{{ if eq $i 0 }}{{ $s.Address }}{{ end }}
     {{- end }}
   {{- else }}db.weave.local{{ end }}
 
