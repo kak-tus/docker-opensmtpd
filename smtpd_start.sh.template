@@ -1,10 +1,16 @@
 #!/usr/bin/env sh
 
-db_host={{ if env "DB_ADDR" }}{{ env "DB_ADDR" }}
-  {{- else if service "db" }}
-    {{- range $i, $s := service "db~_agent" }}{{ if eq $i 0 }}{{ $s.Address }}{{ end }}
+db_host=
+{{- if env "DB_ADDR" }}
+  {{- env "DB_ADDR" }}
+{{- else if service "db" }}
+  {{- range $i, $s := service "db~_agent" }}
+    {{- if eq $i 0 }}
+      {{- $s.Address }}
     {{- end }}
-  {{- else }}db.weave.local{{ end }}
+  {{- end }}
+{{- else }}db.weave.local
+{{- end }}
 
 psql -h "$db_host" -U mail mail -c "COPY ( SELECT DISTINCT substring( alias FROM '\@(.+)$') from dbmail_aliases ) TO STDOUT;" > /etc/smtpd/domains
 psql -h "$db_host" -U mail mail -c "COPY ( SELECT DISTINCT userid, '1000:1000:/root' FROM dbmail_users ) TO STDOUT;" > /etc/smtpd/virtual_users
