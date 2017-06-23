@@ -14,7 +14,12 @@ rspamd_host=
       {{- $s.Address }}:{{ $s.Port }}
     {{- end }}
   {{- end }}
-{{- else }}rspamd.weave.local:11333
+{{- else }}
+  {{- range $dc := datacenters }}
+    {{- range $i, $s := $dc | printf "db@%s" | service }}
+      {{- if eq $i 0 }}{{ $s.Address }}:{{ $s.Port }}{{ end }}
+    {{- end }}
+  {{- end }}
 {{- end }}
 
 /usr/bin/rspamc --mime -h "$rspamd_host" >> $mail_file

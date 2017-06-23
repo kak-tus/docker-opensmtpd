@@ -9,7 +9,12 @@ db_host=
       {{- $s.Address }}
     {{- end }}
   {{- end }}
-{{- else }}db.weave.local
+{{- else }}
+  {{- range $dc := datacenters }}
+    {{- range $i, $s := $dc | printf "db@%s" | service }}
+      {{- if eq $i 0 }}{{ $s.Address }}{{ end }}
+    {{- end }}
+  {{- end }}
 {{- end }}
 
 psql -h "$db_host" -U mail mail -c "COPY ( SELECT DISTINCT substring( alias FROM '\@(.+)$') from dbmail_aliases ) TO STDOUT;" > /etc/smtpd/domains

@@ -1,7 +1,7 @@
-FROM alpine:edge
+FROM alpine:3.6
 
-ENV CONSUL_TEMPLATE_VERSION=0.18.2
-ENV CONSUL_TEMPLATE_SHA256=6fee6ab68108298b5c10e01357ea2a8e4821302df1ff9dd70dd9896b5c37217c
+ENV CONSUL_TEMPLATE_VERSION=0.18.5
+ENV CONSUL_TEMPLATE_SHA256=b0cd6e821d6150c9a0166681072c12e906ed549ef4588f73ed58c9d834295cd2
 
 RUN \
   echo "@testing http://nl.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories \
@@ -22,7 +22,7 @@ RUN \
   && rm consul-template_${CONSUL_TEMPLATE_VERSION}_linux_amd64.zip
 
   # Delete temporary disabled due to @testing warning
-  # Try enable in alpine:3.6
+  # Try enable in alpine:3.7
   # && apk del .build-deps
 
 COPY smtpd.hcl /etc/smtpd.hcl

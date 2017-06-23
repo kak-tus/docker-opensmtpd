@@ -12,7 +12,12 @@ accept tagged IN_CHECKED from local for domain <domains> userbase <virtual_users
       {{- $s.Address }}:{{ $s.Port }}
     {{- end }}
   {{- end }}
-{{- else }}dbmail.weave.local:24
+{{- else }}
+  {{- range $dc := datacenters }}
+    {{- range $i, $s := $dc | printf "dbmail@%s" | service }}
+      {{- if eq $i 0 }}{{ $s.Address }}:{{ $s.Port }}{{ end }}
+    {{- end }}
+  {{- end }}
 {{- end }}
 
 accept tagged IN from any for domain <domains> userbase <virtual_users> deliver to mda "/usr/local/bin/rspamd.sh %{sender} %{rcpt}" as admin
@@ -24,7 +29,12 @@ accept tagged OUT from any for any relay via smtp://{{ if service "dkim" }}
       {{- $s.Address }}:{{ $s.Port }}
     {{- end }}
   {{- end }}
-{{- else }}dkim.weave.local:10027
+{{- else }}
+  {{- range $dc := datacenters }}
+    {{- range $i, $s := $dc | printf "dkim@%s" | service }}
+      {{- if eq $i 0 }}{{ $s.Address }}:{{ $s.Port }}{{ end }}
+    {{- end }}
+  {{- end }}
 {{- end }}
 
 reject from any for any
