@@ -1,13 +1,13 @@
-table domains file:/etc/smtpd/domains
-table userbase file:/etc/smtpd/userbase
-table virtual file:/etc/smtpd/virtual
+table tbl_domains file:/etc/smtpd/domains
+table tbl_userbase file:/etc/smtpd/userbase
+table tbl_virtual file:/etc/smtpd/virtual
 
 listen on 0.0.0.0 port 25 tag IN
 listen on 0.0.0.0 port 10029 tag IN_CHECKED
 listen on 0.0.0.0 port 10028 tag DKIM
 listen on 0.0.0.0 port 10025 tag OUT
 
-accept tagged IN_CHECKED from local for domain <domains> virtual <virtual> userbase <userbase> deliver to lmtp {{ if service "dbmail" }}
+accept tagged IN_CHECKED from local for domain <tbl_domains> virtual <tbl_virtual> userbase <tbl_userbase> deliver to lmtp {{ if service "dbmail" }}
   {{- range $s := service "dbmail~_agent" }}
     {{- if not ( scratch.Key "addr" ) }}
       {{- scratch.Set "addr" "1" }}
@@ -25,7 +25,7 @@ accept tagged IN_CHECKED from local for domain <domains> virtual <virtual> userb
   {{- end }}
 {{- end }}
 
-accept tagged IN from any for domain <domains> virtual <virtual> userbase <userbase> deliver to mda "/usr/local/bin/rspamd.sh %{sender} %{rcpt}" as admin
+accept tagged IN from any for domain <tbl_domains> virtual <tbl_virtual> userbase <tbl_userbase> deliver to mda "/usr/local/bin/rspamd.sh %{sender} %{rcpt}" as admin
 
 accept tagged DKIM from any for any relay
 accept tagged OUT from any for any relay via smtp://{{ if service "dkim" }}
