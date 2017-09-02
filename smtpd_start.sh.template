@@ -4,21 +4,28 @@ db_host=
 {{- if env "DB_ADDR" }}
   {{- env "DB_ADDR" }}
 {{- else if service "db" }}
-  {{- range $i, $s := service "db~_agent" }}
-    {{- if eq $i 0 }}
+  {{- range $s := service "db~_agent" }}
+    {{- if not ( scratch.Key "addr" ) }}
+      {{- scratch.Set "addr" "1" }}
       {{- $s.Address }}
     {{- end }}
   {{- end }}
 {{- else }}
   {{- range $dc := datacenters }}
-    {{- range $i, $s := $dc | printf "db@%s" | service }}
-      {{- if eq $i 0 }}{{ $s.Address }}{{ end }}
+    {{- range $s := $dc | printf "db@%s" | service }}
+      {{- if not ( scratch.Key "addr2" ) }}
+        {{- scratch.Set "addr2" "1" }}
+        {{- $s.Address }}
+      {{- end }}
     {{- end }}
   {{- end }}
 {{- end }}
 
 psql -h "$db_host" -U mail mail -c "COPY ( SELECT DISTINCT substring( alias FROM '\@(.+)$') from dbmail_aliases ) TO STDOUT;" > /etc/smtpd/domains
-psql -h "$db_host" -U mail mail -c "COPY ( SELECT DISTINCT userid, '1000:1000:/root' FROM dbmail_users ) TO STDOUT;" > /etc/smtpd/virtual_users
+
+psql -h "$db_host" -U mail mail -c "COPY ( SELECT DISTINCT userid, '1000:1000:/root' FROM dbmail_users ) TO STDOUT;" > /etc/smtpd/userbase
+
+psql -h "$db_host" -U mail mail -c "COPY ( SELECT public.dbmail_aliases.alias,public.dbmail_users.userid FROM public.dbmail_aliases LEFT JOIN public.dbmail_users ON public.dbmail_users.user_idnr = public.dbmail_aliases.deliver_to::bigint ) TO STDOUT;" > /etc/smtpd/virtual
 
 smtpd -d &
 child=$!

@@ -9,15 +9,19 @@ echo 'DATA' >> $mail_file
 
 rspamd_host=
 {{- if service "rspamd" }}
-  {{- range $i, $s := service "rspamd~_agent" }}
-    {{- if eq $i 0 }}
+  {{- range $s := service "rspamd~_agent" }}
+    {{- if not ( scratch.Key "addr" ) }}
+      {{- scratch.Set "addr" "1" }}
       {{- $s.Address }}:{{ $s.Port }}
     {{- end }}
   {{- end }}
 {{- else }}
   {{- range $dc := datacenters }}
-    {{- range $i, $s := $dc | printf "db@%s" | service }}
-      {{- if eq $i 0 }}{{ $s.Address }}:{{ $s.Port }}{{ end }}
+    {{- range $s := $dc | printf "db@%s" | service }}
+      {{- if not ( scratch.Key "addr2" ) }}
+        {{- scratch.Set "addr2" "1" }}
+        {{- $s.Address }}:{{ $s.Port }}
+      {{- end }}
     {{- end }}
   {{- end }}
 {{- end }}
