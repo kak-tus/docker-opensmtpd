@@ -31,4 +31,6 @@ smtpd -d &
 child=$!
 
 trap "kill $child" TERM INT
-wait $SS_PID
+wait $child
+trap - TERM INT
+wait $child
