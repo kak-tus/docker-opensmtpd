@@ -11,6 +11,7 @@ ENV \
 
 RUN \
   apk add --no-cache \
+    ca-certificates \
     expect \
     opensmtpd \
     postgresql-client \
