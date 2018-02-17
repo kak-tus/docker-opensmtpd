@@ -13,10 +13,10 @@ expect default abort "220 "
 send "HELO localhost\r"
 
 expect default abort "\n250 "
-send "MAIL FROM:$mail_from\r"
+send "MAIL FROM:<$mail_from>\r"
 
 expect default abort "\n250 "
-send "RCPT TO:$rcpt_to\r"
+send "RCPT TO:<$rcpt_to>\r"
 
 expect default abort "\n250 "
 send "DATA\r"
