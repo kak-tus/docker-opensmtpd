@@ -11,6 +11,7 @@ ENV \
 
 RUN \
   apk add --no-cache \
+    expect \
     opensmtpd \
     postgresql-client \
     rspamd-client \
@@ -28,5 +29,6 @@ RUN \
   && apk del .build-deps
 
 COPY templates /root/templates
+COPY nc.expect /usr/local/bin/nc.expect
 
 CMD ["/usr/local/bin/consul-template", "-config", "/root/templates/service.hcl"]

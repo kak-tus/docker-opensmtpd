@@ -1,0 +1,31 @@
+#!/usr/bin/env expect
+
+set mail_from [lindex $argv 0]
+set rcpt_to [lindex $argv 1]
+set mail_file [lindex $argv 2]
+
+set timeout 30
+proc abort {} { exit 2 }
+
+spawn nc localhost 10029
+
+expect default abort "220 "
+send "HELO localhost\r"
+
+expect default abort "\n250 "
+send "MAIL FROM:$mail_from\r"
+
+expect default abort "\n250 "
+send "RCPT TO:$rcpt_to\r"
+
+expect default abort "\n250 "
+send "DATA\r"
+
+expect default abort "\n354 "
+send [exec cat $mail_file]
+
+send "\r"
+send ".\r"
+
+expect default abort "\n250 "
+send "QUIT\r"

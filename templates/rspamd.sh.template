@@ -2,11 +2,6 @@
 
 mail_file=$(mktemp)
 
-echo 'HELO localhost' >> $mail_file
-echo "MAIL FROM: <$1>" >> $mail_file
-echo "RCPT TO: <$2>" >> $mail_file
-echo 'DATA' >> $mail_file
-
 rspamd_host=
 {{- if service "rspamd" }}
   {{- range $s := service "rspamd~_agent" }}
@@ -26,21 +21,18 @@ rspamd_host=
   {{- end }}
 {{- end }}
 
-/usr/bin/rspamc --mime -h "$rspamd_host" >> $mail_file
+/usr/bin/rspamc --mime -h "$rspamd_host" -t 120 > $mail_file
 
 greylisted=$( cat $mail_file | fgrep 'X-Spam-Action: soft reject' )
 if [ -n "$greylisted" ]; then
+  rm "$mail_file"
   exit 1
 fi
-
-echo '' >> $mail_file
-echo '.' >> $mail_file
-echo 'QUIT' >> $mail_file
 
 cut_file=$(mktemp)
 sed '/Delivered-To/d' $mail_file > $cut_file
 rm "$mail_file"
 
-count=0; IFS=''; while read -r line ; do if [ "$count" -gt "5" ]; then sleep 0.05; else sleep 0.1; fi; echo "$line"; count=$((count+1)); done < "$cut_file" | nc localhost 10029
+/usr/local/bin/nc.expect "$1" "$2" "$cut_file"
 
 rm "$cut_file"
