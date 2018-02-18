@@ -12,8 +12,6 @@ proc abort {} {
   expect default abort_exit "\n250 "
   send "QUIT\r"
 
-  wait
-
   exit 2
 }
 
@@ -40,4 +38,3 @@ send ".\r"
 expect default abort_exit "\n250 "
 send "QUIT\r"
 
-wait
