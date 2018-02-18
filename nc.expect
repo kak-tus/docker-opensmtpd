@@ -15,7 +15,7 @@ proc abort {} {
   exit 2
 }
 
-spawn nc localhost 10029
+spawn nc -w 60 localhost 10029
 
 expect default abort "220 "
 send "HELO localhost\r"
