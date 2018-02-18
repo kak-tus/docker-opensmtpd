@@ -29,3 +29,5 @@ send ".\r"
 
 expect default abort "\n250 "
 send "QUIT\r"
+
+wait
