@@ -5,7 +5,17 @@ set rcpt_to [lindex $argv 1]
 set mail_file [lindex $argv 2]
 
 set timeout 30
-proc abort {} { exit 2 }
+
+proc abort_exit {} { exit 2 }
+
+proc abort {} {
+  expect default abort_exit "\n250 "
+  send "QUIT\r"
+
+  wait
+
+  exit 2
+}
 
 spawn nc localhost 10029
 
@@ -27,7 +37,7 @@ send [exec cat $mail_file]
 send "\r"
 send ".\r"
 
-expect default abort "\n250 "
+expect default abort_exit "\n250 "
 send "QUIT\r"
 
 wait
