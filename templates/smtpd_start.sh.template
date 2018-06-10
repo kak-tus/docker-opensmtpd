@@ -4,15 +4,15 @@ db_host=
 {{- if env "DB_ADDR" }}
   {{- env "DB_ADDR" }}
 {{- else if service "db" }}
-  {{- range $s := service "db~_agent" }}
-    {{- if not ( scratch.Key "addr" ) }}
-      {{- scratch.Set "addr" "1" }}
+  {{- range $s := service "db~_agent" | service | toJSON | plugin "rttfix" | parseJSON }}
+    {{- if not ( scratch.Key "addr1" ) }}
+      {{- scratch.Set "addr1" "1" }}
       {{- $s.Address }}
     {{- end }}
   {{- end }}
 {{- else }}
-  {{- range $dc := datacenters }}
-    {{- range $s := $dc | printf "db@%s" | service }}
+  {{- range $dc := datacenters true }}
+    {{- range $s := $dc | printf "db@%s" | service | service | toJSON | plugin "rttfix" | parseJSON }}
       {{- if not ( scratch.Key "addr2" ) }}
         {{- scratch.Set "addr2" "1" }}
         {{- $s.Address }}

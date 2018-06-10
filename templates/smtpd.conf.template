@@ -8,15 +8,15 @@ listen on 0.0.0.0 port 10028 tag DKIM
 listen on 0.0.0.0 port 10025 tag OUT
 
 accept tagged IN_CHECKED from local for domain <tbl_domains> virtual <tbl_virtual> userbase <tbl_userbase> deliver to lmtp {{ if service "dbmail" }}
-  {{- range $s := service "dbmail~_agent" }}
-    {{- if not ( scratch.Key "addr" ) }}
-      {{- scratch.Set "addr" "1" }}
+  {{- range $s := service "dbmail~_agent" | service | toJSON | plugin "rttfix" | parseJSON }}
+    {{- if not ( scratch.Key "addr1" ) }}
+      {{- scratch.Set "addr1" "1" }}
       {{- $s.Address }}:{{ $s.Port }}
     {{- end }}
   {{- end }}
 {{- else }}
-  {{- range $dc := datacenters }}
-    {{- range $s := $dc | printf "dbmail@%s" | service }}
+  {{- range $dc := datacenters true }}
+    {{- range $s := $dc | printf "dbmail@%s" | service  | service | toJSON | plugin "rttfix" | parseJSON }}
       {{- if not ( scratch.Key "addr2" ) }}
         {{- scratch.Set "addr2" "1" }}
         {{- $s.Address }}:{{ $s.Port }}
@@ -29,15 +29,15 @@ accept tagged IN from any for domain <tbl_domains> virtual <tbl_virtual> userbas
 
 accept tagged DKIM from any for any relay
 accept tagged OUT from any for any relay via smtp://{{ if service "dkim" }}
-  {{- range $s := service "dkim~_agent" }}
+  {{- range $s := service "dkim~_agent" | service | toJSON | plugin "rttfix" | parseJSON }}
     {{- if not ( scratch.Key "addr3" ) }}
       {{- scratch.Set "addr3" "1" }}
       {{- $s.Address }}:{{ $s.Port }}
     {{- end }}
   {{- end }}
 {{- else }}
-  {{- range $dc := datacenters }}
-    {{- range $s := $dc | printf "dkim@%s" | service }}
+  {{- range $dc := datacenters true }}
+    {{- range $s := $dc | printf "dkim@%s" | service | service | toJSON | plugin "rttfix" | parseJSON }}
       {{- if not ( scratch.Key "addr4" ) }}
         {{- scratch.Set "addr4" "1" }}
         {{- $s.Address }}:{{ $s.Port }}
