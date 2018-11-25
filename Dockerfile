@@ -1,4 +1,4 @@
-FROM alpine:3.7 AS build
+FROM alpine:3.8 AS build
 
 ENV \
   CONSUL_TEMPLATE_VERSION=0.19.4 \
@@ -23,6 +23,14 @@ RUN \
   && echo -n "$RTTFIX_SHA256  rttfix" | sha256sum -c - \
   && chmod +x rttfix
 
+FROM golang:1.11.1-alpine3.8 AS build-go
+
+WORKDIR /go/src/github.com/kak-tus/nc
+
+COPY nc.go .
+
+RUN go install
+
 FROM alpine:3.7
 
 ENV \
@@ -34,7 +42,6 @@ ENV \
 RUN \
   apk add --no-cache \
     ca-certificates \
-    expect \
     opensmtpd \
     postgresql-client \
     rspamd-client
@@ -42,6 +49,6 @@ RUN \
 COPY --from=build /usr/local/bin/rttfix /usr/local/bin/rttfix
 COPY --from=build /usr/local/bin/consul-template /usr/local/bin/consul-template
 COPY templates /root/templates
-COPY nc.expect /usr/local/bin/nc.expect
+COPY --from=build-go /go/bin/nc /usr/local/bin/nc
 
 CMD ["/usr/local/bin/consul-template", "-config", "/root/templates/service.hcl"]
