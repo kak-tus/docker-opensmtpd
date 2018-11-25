@@ -25,7 +25,7 @@ func main() {
 		os.Exit(1)
 	}()
 
-	conn, err := net.DialTimeout("tcp", "c2.prepodam.ru:10029", time.Second)
+	conn, err := net.DialTimeout("tcp", "localhost:10029", time.Second)
 	if err != nil {
 		println(err)
 		os.Exit(1)
