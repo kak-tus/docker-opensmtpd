@@ -25,9 +25,9 @@ RUN \
 
 FROM golang:1.11.1-alpine3.8 AS build-go
 
-WORKDIR /go/src/github.com/kak-tus/nc
+WORKDIR /go/src/github.com/kak-tus/docker-opensmtpd/nc
 
-COPY nc.go .
+COPY nc/main.go .
 
 RUN go install
 

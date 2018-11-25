@@ -45,6 +45,7 @@ func main() {
 		os.Exit(1)
 	}
 
+	println("HELO localhost")
 	fmt.Fprintf(conn, "HELO localhost\r\n")
 	val, err = rdr.ReadString('\n')
 	if err != nil {
@@ -58,6 +59,7 @@ func main() {
 		os.Exit(1)
 	}
 
+	println(fmt.Sprintf("MAIL FROM:<%s>", from))
 	fmt.Fprintf(conn, "MAIL FROM:<%s>\r\n", from)
 	val, err = rdr.ReadString('\n')
 	if err != nil {
@@ -71,9 +73,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	l := fmt.Sprintf("RCPT TO:<%s>\r\n", to)
-	println(l)
-	fmt.Fprintf(conn, l)
+	println(fmt.Sprintf("RCPT TO:<%s>", to))
+	fmt.Fprintf(conn, "RCPT TO:<%s>\r\n", to)
 	val, err = rdr.ReadString('\n')
 	if err != nil {
 		println(err)
@@ -86,6 +87,7 @@ func main() {
 		os.Exit(1)
 	}
 
+	println("DATA")
 	fmt.Fprintf(conn, "DATA\r\n")
 	val, err = rdr.ReadString('\n')
 	if err != nil {
@@ -118,18 +120,21 @@ func main() {
 		println(err)
 		os.Exit(1)
 	}
+	println(val)
 
 	if !(len(val) >= 4 && val[0:4] == "250 ") {
 		println("Incorrect response: ", val)
 		os.Exit(1)
 	}
 
+	println("QUIT")
 	fmt.Fprintf(conn, "QUIT\r\n")
 	val, err = rdr.ReadString('\n')
 	if err != nil {
 		println(err)
 		os.Exit(1)
 	}
+	println(val)
 
 	if !(len(val) >= 4 && val[0:4] == "221 ") {
 		println("Incorrect response: ", val)
