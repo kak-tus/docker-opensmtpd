@@ -16,7 +16,7 @@ func main() {
 
 	from := os.Args[1]
 	to := os.Args[2]
-	file := os.Args[2]
+	file := os.Args[3]
 
 	go func() {
 		t := time.NewTimer(time.Second * 10)
@@ -38,63 +38,54 @@ func main() {
 		println(err)
 		os.Exit(1)
 	}
-	println(val)
 
 	if !(len(val) >= 4 && val[0:4] == "220 ") {
 		println("Incorrect response: ", val)
 		os.Exit(1)
 	}
 
-	println("HELO localhost")
 	fmt.Fprintf(conn, "HELO localhost\r\n")
 	val, err = rdr.ReadString('\n')
 	if err != nil {
 		println(err)
 		os.Exit(1)
 	}
-	println(val)
 
 	if !(len(val) >= 4 && val[0:4] == "250 ") {
 		println("Incorrect response: ", val)
 		os.Exit(1)
 	}
 
-	println(fmt.Sprintf("MAIL FROM:<%s>", from))
 	fmt.Fprintf(conn, "MAIL FROM:<%s>\r\n", from)
 	val, err = rdr.ReadString('\n')
 	if err != nil {
 		println(err)
 		os.Exit(1)
 	}
-	println(val)
 
 	if !(len(val) >= 4 && val[0:4] == "250 ") {
 		println("Incorrect response: ", val)
 		os.Exit(1)
 	}
 
-	println(fmt.Sprintf("RCPT TO:<%s>", to))
 	fmt.Fprintf(conn, "RCPT TO:<%s>\r\n", to)
 	val, err = rdr.ReadString('\n')
 	if err != nil {
 		println(err)
 		os.Exit(1)
 	}
-	println(val)
 
 	if !(len(val) >= 4 && val[0:4] == "250 ") {
 		println("Incorrect response: ", val)
 		os.Exit(1)
 	}
 
-	println("DATA")
 	fmt.Fprintf(conn, "DATA\r\n")
 	val, err = rdr.ReadString('\n')
 	if err != nil {
 		println(err)
 		os.Exit(1)
 	}
-	println(val)
 
 	if !(len(val) >= 4 && val[0:4] == "354 ") {
 		println("Incorrect response: ", val)
@@ -103,7 +94,7 @@ func main() {
 
 	h, err := os.Open(file)
 	if err != nil {
-		println(err)
+		println("Open error", err)
 		os.Exit(1)
 	}
 
@@ -120,21 +111,18 @@ func main() {
 		println(err)
 		os.Exit(1)
 	}
-	println(val)
 
 	if !(len(val) >= 4 && val[0:4] == "250 ") {
 		println("Incorrect response: ", val)
 		os.Exit(1)
 	}
 
-	println("QUIT")
 	fmt.Fprintf(conn, "QUIT\r\n")
 	val, err = rdr.ReadString('\n')
 	if err != nil {
 		println(err)
 		os.Exit(1)
 	}
-	println(val)
 
 	if !(len(val) >= 4 && val[0:4] == "221 ") {
 		println("Incorrect response: ", val)

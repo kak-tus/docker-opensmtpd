@@ -33,6 +33,6 @@ cut_file=$(mktemp)
 sed '/Delivered-To/d' $mail_file > $cut_file
 rm "$mail_file"
 
-/usr/local/bin/nc "$1" "$2" "$cut_file" >> /tmp/nclog
+/usr/local/bin/nc "$1" "$2" "$cut_file"
 
 rm "$cut_file"
