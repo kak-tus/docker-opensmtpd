@@ -19,7 +19,7 @@ func main() {
 	file := os.Args[3]
 
 	go func() {
-		t := time.NewTimer(time.Second * 10)
+		t := time.NewTimer(time.Second * 60)
 		<-t.C
 		println("Timeout")
 		os.Exit(1)
