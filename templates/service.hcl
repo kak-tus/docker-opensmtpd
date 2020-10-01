@@ -3,6 +3,13 @@ max_stale = "2m"
 template {
   source = "/root/templates/smtpd.conf.template"
   destination = "/etc/smtpd/smtpd.conf"
+  perms = 0644
+}
+
+template {
+  source = "/root/templates/mailname.template"
+  destination = "/etc/smtpd/mailname"
+  perms = 0644
 }
 
 template {
@@ -14,12 +21,6 @@ template {
 template {
   source = "/root/templates/smtpd_start.sh.template"
   destination = "/usr/local/bin/smtpd_start.sh"
-  perms = 0755
-}
-
-template {
-  source = "/root/templates/rspamd.sh.template"
-  destination = "/usr/local/bin/rspamd.sh"
   perms = 0755
 }
 

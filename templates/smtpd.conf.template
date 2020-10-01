@@ -2,48 +2,15 @@ table tbl_domains file:/etc/smtpd/domains
 table tbl_userbase file:/etc/smtpd/userbase
 table tbl_virtual file:/etc/smtpd/virtual
 
-listen on 0.0.0.0 port 25 tag IN
-listen on 0.0.0.0 port 10029 tag IN_CHECKED
+filter "rspamd" proc-exec "filter-rspamd -url {{ env "RSPAMD_ADDR" }}"
+
+listen on 0.0.0.0 port 25 tag IN filter "rspamd"
 listen on 0.0.0.0 port 10028 tag DKIM
 listen on 0.0.0.0 port 10025 tag OUT
 
-accept tagged IN_CHECKED from local for domain <tbl_domains> virtual <tbl_virtual> userbase <tbl_userbase> deliver to lmtp {{ if service "dbmail" }}
-  {{- range $s := service "dbmail~_agent" | toJSON | plugin "rttfix" | parseJSON }}
-    {{- if not ( scratch.Key "addr1" ) }}
-      {{- scratch.Set "addr1" "1" }}
-      {{- $s.Address }}:{{ $s.Port }}
-    {{- end }}
-  {{- end }}
-{{- else }}
-  {{- range $dc := datacenters true }}
-    {{- range $s := $dc | printf "dbmail@%s" | service  | toJSON | plugin "rttfix" | parseJSON }}
-      {{- if not ( scratch.Key "addr2" ) }}
-        {{- scratch.Set "addr2" "1" }}
-        {{- $s.Address }}:{{ $s.Port }}
-      {{- end }}
-    {{- end }}
-  {{- end }}
-{{- end }}
-
-accept tagged IN from any for domain <tbl_domains> virtual <tbl_virtual> userbase <tbl_userbase> deliver to mda "/usr/local/bin/rspamd.sh %{sender} %{rcpt}" as admin
+accept tagged IN from any for domain <tbl_domains> virtual <tbl_virtual> userbase <tbl_userbase> deliver to lmtp {{ env "LMTP_ADDR" }}
 
 accept tagged DKIM from any for any relay
-accept tagged OUT from any for any relay via smtp://{{ if service "dkim" }}
-  {{- range $s := service "dkim~_agent" | toJSON | plugin "rttfix" | parseJSON }}
-    {{- if not ( scratch.Key "addr3" ) }}
-      {{- scratch.Set "addr3" "1" }}
-      {{- $s.Address }}:{{ $s.Port }}
-    {{- end }}
-  {{- end }}
-{{- else }}
-  {{- range $dc := datacenters true }}
-    {{- range $s := $dc | printf "dkim@%s" | service | toJSON | plugin "rttfix" | parseJSON }}
-      {{- if not ( scratch.Key "addr4" ) }}
-        {{- scratch.Set "addr4" "1" }}
-        {{- $s.Address }}:{{ $s.Port }}
-      {{- end }}
-    {{- end }}
-  {{- end }}
-{{- end }}
+accept tagged OUT from any for any relay via smtp://{{ env "DKIM_ADDR" }}
 
 reject from any for any

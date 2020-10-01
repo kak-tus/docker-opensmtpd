@@ -1,14 +1,11 @@
-FROM alpine:3.8 AS build
+FROM alpine:3.12 AS build
 
 ENV \
-  CONSUL_TEMPLATE_VERSION=0.19.4 \
-  CONSUL_TEMPLATE_SHA256=5f70a7fb626ea8c332487c491924e0a2d594637de709e5b430ecffc83088abc0 \
-  \
-  RTTFIX_VERSION=0.1 \
-  RTTFIX_SHA256=349b309c8b4ba0afe3acf7a0b0173f9e68fffc0f93bad4b3087735bd094dea0d
+  CONSUL_TEMPLATE_VERSION=0.25.1 \
+  CONSUL_TEMPLATE_SHA256=58356ec125c85b9705dc7734ed4be8491bb4152d8a816fd0807aed5fbb128a7b
 
 RUN \
-  apk add --no-cache --virtual .build-deps \
+  apk add --no-cache \
     curl \
     unzip \
   \
@@ -16,39 +13,39 @@ RUN \
   && curl -L https://releases.hashicorp.com/consul-template/${CONSUL_TEMPLATE_VERSION}/consul-template_${CONSUL_TEMPLATE_VERSION}_linux_amd64.zip -o consul-template_${CONSUL_TEMPLATE_VERSION}_linux_amd64.zip \
   && echo -n "$CONSUL_TEMPLATE_SHA256  consul-template_${CONSUL_TEMPLATE_VERSION}_linux_amd64.zip" | sha256sum -c - \
   && unzip consul-template_${CONSUL_TEMPLATE_VERSION}_linux_amd64.zip \
-  && rm consul-template_${CONSUL_TEMPLATE_VERSION}_linux_amd64.zip \
-  \
-  && cd /usr/local/bin \
-  && curl -L https://github.com/kak-tus/rttfix/releases/download/$RTTFIX_VERSION/rttfix -o rttfix \
-  && echo -n "$RTTFIX_SHA256  rttfix" | sha256sum -c - \
-  && chmod +x rttfix
+  && rm consul-template_${CONSUL_TEMPLATE_VERSION}_linux_amd64.zip
 
-FROM golang:1.11.1-alpine3.8 AS build-go
+FROM golang:1.15.2-alpine3.12 AS build-go
 
-WORKDIR /go/src/github.com/kak-tus/docker-opensmtpd/nc
+RUN \
+  apk add --no-cache \
+    git
 
-COPY nc/main.go .
+WORKDIR /go/nc
 
-RUN go install
+RUN go get github.com/poolpOrg/filter-rspamd
 
-FROM alpine:3.7
+FROM alpine:3.12
 
 ENV \
   CONSUL_HTTP_ADDR= \
   CONSUL_TOKEN= \
-  VAULT_ADDR= \
-  VAULT_TOKEN=
+  DB_ADDR= \
+  DB_PASSWORD= \
+  DB_USER= \
+  DKIM_ADDR= \
+  LMTP_ADDR= \
+  MAIL_SERVER_NAME= \
+  RSPAMD_ADDR=
 
 RUN \
   apk add --no-cache \
     ca-certificates \
     opensmtpd \
-    postgresql-client \
-    rspamd-client
+    postgresql-client
 
-COPY --from=build /usr/local/bin/rttfix /usr/local/bin/rttfix
 COPY --from=build /usr/local/bin/consul-template /usr/local/bin/consul-template
 COPY templates /root/templates
-COPY --from=build-go /go/bin/nc /usr/local/bin/nc
+COPY --from=build-go /go/bin/filter-rspamd /usr/local/bin/filter-rspamd
 
 CMD ["/usr/local/bin/consul-template", "-config", "/root/templates/service.hcl"]
