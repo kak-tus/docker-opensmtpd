@@ -1,1 +1,1 @@
-{{ env "DB_ADDR" }}:*:{{ env "DB_USER" }}:{{ env "DB_PASSWORD" }}
+{{ env "DB_ADDR" }}:5432:*:{{ env "DB_USER" }}:{{ env "DB_PASSWORD" }}
