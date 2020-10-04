@@ -46,6 +46,6 @@ RUN \
 
 COPY --from=build /usr/local/bin/consul-template /usr/local/bin/consul-template
 COPY templates /root/templates
-COPY --from=build-go /go/bin/filter-rspamd /usr/local/bin/filter-rspamd
+COPY --from=build-go /go/bin/filter-rspamd /usr/lib/opensmtpd/filter-rspamd
 
 CMD ["/usr/local/bin/consul-template", "-config", "/root/templates/service.hcl"]
