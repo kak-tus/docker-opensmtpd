@@ -24,6 +24,10 @@ template {
   perms = 0755
 }
 
+vault {
+  renew_token = false
+}
+
 exec {
   command = "/usr/local/bin/smtpd_start.sh"
   splay = "60s"
